@@ -7,10 +7,12 @@ from email.parser import HeaderParser
 
 parser = HeaderParser()
 
+GET_EMAILS_FROM_DATE = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%d-%b-%Y")
+
 
 class ScrapeEmails:
     def __init__(self, e):
-        self.get_emails_from = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%d-%b-%Y")
+        self.get_emails_from = GET_EMAILS_FROM_DATE
         self.email_addr = e
         self.subjects = []
         self.m = imaplib.IMAP4_SSL('imap.gmail.com')
@@ -35,15 +37,25 @@ class ScrapeEmails:
         print "Logged out of " + self.email_addr
 
 
-email_addr = sys.argv[1]
-connect = ScrapeEmails(email_addr)
-connect.get_data()
-with open("subjects.txt", 'r+') as f:
-    f.seek(0)
-    for subject in connect.subjects:
-        f.write(subject)
-    f.truncate()
-    f.close()
-print connect.subjects
-# todo store data in a file
-connect.logout()
+def get_email_subjects():
+    email_addr = sys.argv[1]
+    connect = ScrapeEmails(email_addr)
+    connect.get_data()
+    write_subjects(connect)
+
+
+def write_subjects(connect):
+    with open("subjects.txt", 'wb') as f:
+        for subject in connect.subjects:
+            f.write(subject)
+        f.truncate()
+        f.close()
+    print connect.subjects
+    logout(connect)
+
+
+def logout(connect):
+    connect.logout()
+
+
+get_email_subjects()

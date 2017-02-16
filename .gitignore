@@ -1,4 +1,5 @@
 # Created by .ignore support plugin (hsz.mobi)
+.idea
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/dataSources/
@@ -80,3 +81,5 @@ ENV/
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+.idea/
+subjects.txt
