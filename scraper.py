@@ -2,6 +2,7 @@ import sys
 import getpass
 import imaplib
 import datetime
+import csv
 
 from email.parser import HeaderParser
 
@@ -14,7 +15,7 @@ class ScrapeEmails:
     def __init__(self, e):
         self.get_emails_from = GET_EMAILS_FROM_DATE
         self.email_addr = e
-        self.subjects = []
+        self.subjects = {}
         self.m = imaplib.IMAP4_SSL('imap.gmail.com')
         try:
             self.m.login(self.email_addr, getpass.getpass())
@@ -30,7 +31,7 @@ class ScrapeEmails:
             typ2, msg_data = self.m.fetch(resp, '(RFC822)')
             header_data = msg_data[0][1]
             msg = parser.parsestr(header_data)
-            self.subjects.append(msg['Subject'])
+            self.subjects[msg['From']] = msg['Subject']
 
     def logout(self):
         self.m.logout()
@@ -46,16 +47,15 @@ def get_email_subjects():
 
 def write_subjects(connect):
     with open("subjects.txt", 'wb') as f:
-        for subject in connect.subjects:
-            f.write(subject)
-        f.truncate()
-        f.close()
-    print connect.subjects
+        writer = csv.writer(f)
+        writer.writerow(["From", "Subject"])
+        for key, value in connect.subjects.iteritems():
+            writer.writerow([key, value])
     logout(connect)
 
 
 def logout(connect):
     connect.logout()
 
-
-get_email_subjects()
+if __name__ == '__main__':
+    get_email_subjects()
