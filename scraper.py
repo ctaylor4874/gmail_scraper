@@ -4,6 +4,7 @@ import imaplib
 import datetime
 import csv
 
+from email.header import decode_header
 from email.parser import HeaderParser
 
 parser = HeaderParser()
@@ -26,7 +27,7 @@ class ScrapeEmails:
 
     def get_data(self):
         self.m.select(mailbox='INBOX')
-        typ, data = self.m.search(None, '(SINCE "%s")' % self.get_emails_from)
+        typ, data = self.m.search("utf-8", '(SINCE "%s")' % self.get_emails_from)
         for resp in data[0].split():
             typ2, msg_data = self.m.fetch(resp, '(RFC822)')
             header_data = msg_data[0][1]
@@ -45,17 +46,28 @@ def get_email_subjects():
     write_subjects(connect)
 
 
+def decode(s):
+    new_str = decode_header(s)
+    print new_str[0][0]
+    return new_str[0][0]
+
+
 def write_subjects(connect):
     with open("subjects.txt", 'wb') as f:
         writer = csv.writer(f)
         writer.writerow(["From", "Subject"])
         for key, value in connect.subjects.iteritems():
+            if '=?utf-8?' in key:
+                key = decode(key)
+            elif '=?utf-8?' in value:
+                value = decode(value)
             writer.writerow([key, value])
     logout(connect)
 
 
 def logout(connect):
     connect.logout()
+
 
 if __name__ == '__main__':
     get_email_subjects()
