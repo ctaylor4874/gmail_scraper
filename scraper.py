@@ -40,31 +40,35 @@ class ScrapeEmails:
         print "Logged out of " + self.email_addr
 
 
-def get_email_subjects():
-    email_addr = sys.argv[1]
-    connect = ScrapeEmails(email_addr)
-    connect.get_data()
-    write_subjects(connect)
+class FormatAndStore:
+    def __init__(self):
+        self.email_addr = sys.argv[1]
+        self.connect = ScrapeEmails(self.email_addr)
+        self.get_email_subjects()
 
+    def get_email_subjects(self):
+        # self.email_addr = sys.argv[1]
+        # connect = ScrapeEmails(email_addr)
+        self.connect.get_data()
+        self.write_subjects()
 
-def decode(s):
-    new_str = decode_header(s)
-    return new_str[0][0]
+    @staticmethod
+    def decode(s):
+        new_str = decode_header(s)
+        return new_str[0][0]
 
+    def write_subjects(self):
+        with open("subjects.txt", 'wb') as f:
+            writer = csv.writer(f)
+            writer.writerow(["Subjects From Past Day"])
+            for subject in self.connect.subjects:
+                subject = self.decode(subject)
+                writer.writerow([subject])
+        self.logout()
 
-def write_subjects(connect):
-    with open("subjects.txt", 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerow(["Subjects From Past Day"])
-        for subject in connect.subjects:
-            subject = decode(subject)
-            writer.writerow([subject])
-    logout(connect)
-
-
-def logout(connect):
-    connect.logout()
+    def logout(self):
+        self.connect.logout()
 
 
 if __name__ == '__main__':
-    get_email_subjects()
+    FormatAndStore()
