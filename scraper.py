@@ -16,7 +16,7 @@ class ScrapeEmails:
     def __init__(self, e):
         self.get_emails_from = GET_EMAILS_FROM_DATE
         self.email_addr = e
-        self.subjects = {}
+        self.subjects = []
         self.m = imaplib.IMAP4_SSL('imap.gmail.com')
         try:
             self.m.login(self.email_addr, getpass.getpass())
@@ -26,13 +26,14 @@ class ScrapeEmails:
             print "Login Failed! Check username and password"
 
     def get_data(self):
-        self.m.select(mailbox='INBOX')
+        self.m.select(mailbox='INBOX', readonly=True)
         typ, data = self.m.search(None, '(SINCE "%s")' % self.get_emails_from)
         for resp in data[0].split():
             typ2, msg_data = self.m.fetch(resp, '(RFC822)')
             header_data = msg_data[0][1]
             msg = parser.parsestr(header_data)
-            self.subjects[msg['From']] = msg['Subject']
+            self.subjects.append(msg['Subject'])
+        self.subjects = list(reversed(self.subjects))
 
     def logout(self):
         self.m.logout()
@@ -54,11 +55,10 @@ def decode(s):
 def write_subjects(connect):
     with open("subjects.txt", 'wb') as f:
         writer = csv.writer(f)
-        writer.writerow(["From", "Subject"])
-        for key, value in connect.subjects.iteritems():
-            key = decode(key)
-            value = decode(value)
-            writer.writerow([key, value])
+        writer.writerow(["Subjects From Past Day"])
+        for subject in connect.subjects:
+            subject = decode(subject)
+            writer.writerow([subject])
     logout(connect)
 
 
