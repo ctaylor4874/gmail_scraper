@@ -41,7 +41,7 @@ class ScrapeEmails:
 
         If login is successful, print Login Success.
 
-        :return: None
+        :return:
         """
         self.m.login(self.email_addr, getpass.getpass())
         print "Logged in as {}.".format(self.email_addr)
@@ -54,7 +54,7 @@ class ScrapeEmails:
         emails received since the get_emails_from date. Fetches and parses the data and stores the 'Subject' from
         each email in self.subjects. The subjects list is then reversed to put the list in ascending order by date.
 
-        :return: None
+        :return:
         """
         self.m.select(mailbox='INBOX', readonly=True)
         typ, data = self.m.search(None, '(SINCE "%s")' % self.get_emails_from)
@@ -69,7 +69,7 @@ class ScrapeEmails:
         """
         Terminates the connection to the users email account.
 
-        :return: None
+        :return:
         """
         self.m.logout()
         print "Logged out of {}.".format(self.email_addr)
@@ -91,7 +91,7 @@ class FormatAndStore:
         """
         Calls the methods to login, get data, and write subjects to a location.
 
-        :return: None
+        :return:
         """
         self.connect.login()
         self.connect.get_data()
@@ -116,7 +116,7 @@ class FormatAndStore:
 
         Iterates through subject list and decodes each subject.  Writes the subjects to a file.
 
-        :return: None
+        :return:
         """
         with open("subjects.txt", 'wb') as f:
             writer = csv.writer(f)
@@ -128,7 +128,7 @@ class FormatAndStore:
         """
         Makes the call to terminate the users connection to their email account.
 
-        :return: None
+        :return:
         """
         self.connect.logout()
 
