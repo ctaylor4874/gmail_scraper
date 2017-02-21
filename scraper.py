@@ -77,7 +77,7 @@ class ScrapeEmails:
 
 class FormatAndStore:
     """
-    Formats and stores the email data received.
+    Formats and stores the email data.
     """
 
     def __init__(self):
