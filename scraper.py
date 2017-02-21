@@ -44,7 +44,7 @@ class ScrapeEmails:
         :return: None
         """
         self.m.login(self.email_addr, getpass.getpass())
-        print "Login success."
+        print "Logged in as {}.".format(self.email_addr)
 
     def get_data(self):
         """
@@ -72,7 +72,7 @@ class ScrapeEmails:
         :return: None
         """
         self.m.logout()
-        print "Logged out of {}".format(self.email_addr)
+        print "Logged out of {}.".format(self.email_addr)
 
 
 class FormatAndStore:
