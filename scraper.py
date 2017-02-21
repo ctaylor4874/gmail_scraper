@@ -47,8 +47,6 @@ class FormatAndStore:
         self.get_email_subjects()
 
     def get_email_subjects(self):
-        # self.email_addr = sys.argv[1]
-        # connect = ScrapeEmails(email_addr)
         self.connect.get_data()
         self.write_subjects()
 
