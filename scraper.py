@@ -10,6 +10,7 @@ from email.parser import HeaderParser
 parser = HeaderParser()
 
 GET_EMAILS_FROM_DATE = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%d-%b-%Y")
+IMAP4_SSL_HOST = 'imap.gmail.com'
 
 
 class ScrapeEmails:
@@ -17,13 +18,11 @@ class ScrapeEmails:
         self.get_emails_from = GET_EMAILS_FROM_DATE
         self.email_addr = e
         self.subjects = []
-        self.m = imaplib.IMAP4_SSL('imap.gmail.com')
-        try:
-            self.m.login(self.email_addr, getpass.getpass())
-            print("Logged in as " + self.email_addr)
+        self.m = imaplib.IMAP4_SSL(IMAP4_SSL_HOST)
 
-        except imaplib.IMAP4.error:
-            print "Login Failed! Check username and password"
+    def login(self):
+        self.m.login(self.email_addr, getpass.getpass())
+        print "Login success."
 
     def get_data(self):
         self.m.select(mailbox='INBOX', readonly=True)
@@ -44,9 +43,9 @@ class FormatAndStore:
     def __init__(self):
         self.email_addr = sys.argv[1]
         self.connect = ScrapeEmails(self.email_addr)
-        self.get_email_subjects()
 
     def get_email_subjects(self):
+        self.connect.login()
         self.connect.get_data()
         self.write_subjects()
 
@@ -58,7 +57,6 @@ class FormatAndStore:
     def write_subjects(self):
         with open("subjects.txt", 'wb') as f:
             writer = csv.writer(f)
-            writer.writerow(["Subjects From Past Day"])
             for subject in self.connect.subjects:
                 subject = self.decode(subject)
                 writer.writerow([subject])
@@ -69,4 +67,4 @@ class FormatAndStore:
 
 
 if __name__ == '__main__':
-    FormatAndStore()
+    FormatAndStore().get_email_subjects()
